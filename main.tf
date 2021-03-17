@@ -127,6 +127,8 @@ output "instance_ip_addr" {
   description = "The public IP address of the mirror server for ssh and http access."
 }
 
+resource "null_resource" "example" {}
+
 resource "aws_volume_attachment" "data_drive" {
   device_name = "/dev/sdb"
   volume_id = "${aws_ebs_volume.jlk-alpine-rnd.id}"
