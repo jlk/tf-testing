@@ -42,7 +42,7 @@ variable "subnet_id" {
 
 variable "vpc_id" {
   type = string
-  description = "ID of VPC to place instance in"
+  description = "IDD of VPC to place instance in"
 }
 
 provider "aws" {
