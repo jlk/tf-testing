@@ -9,7 +9,7 @@ variable "storage_size" {
 variable "http_acl" {
   type = list(string)
   default = ["0.0.0.0/0"]
-  description = "List of CIDR blocks to allow http traffic from"
+  description = "lList of CIDR blocks to allow http traffic from"
 }
 
 variable "ssh_acl" {
