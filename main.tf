@@ -130,7 +130,7 @@ output "instance_ip_addr" {
 resource "null_resource" "example" {}
 
 resource "aws_volume_attachment" "data_drive" {
-  device_name = "/dev/sdb"
+  device_name = "/dev/sdd"
   volume_id = "${aws_ebs_volume.jlk-alpine-rnd.id}"
   instance_id = "${aws_instance.alpine_mirror.id}"
 
