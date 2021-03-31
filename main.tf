@@ -46,7 +46,7 @@ variable "vpc_id" {
 }
 
 provider "aws" {
-  region = "${var.region}"
+  region = var.region
 }
 
 data "aws_ami" "centos" {
@@ -68,7 +68,7 @@ data "aws_ami" "centos" {
 resource "aws_security_group" "web_server" {
   name        = "web_server"
   description = "Basic ACLs for webserver"
-  vpc_id      = "${var.vpc_id}"
+  vpc_id      = "var.vpc_id"
 
   egress {
     protocol = "-1"
@@ -81,7 +81,7 @@ resource "aws_security_group" "web_server" {
     protocol = "tcp"
     from_port = 80
     to_port = 80
-    cidr_blocks = "${var.http_acl}"
+    cidr_blocks = var.http_acl
     description = "http access"
   }
 
@@ -89,7 +89,7 @@ resource "aws_security_group" "web_server" {
     protocol = "tcp"
     from_port = 22
     to_port = 22
-    cidr_blocks = "${var.ssh_acl}"
+    cidr_blocks = var.ssh_acl
     description = "ssh access"
   }
 }
@@ -97,7 +97,7 @@ resource "aws_security_group" "web_server" {
 resource "aws_ebs_volume" "jlk-alpine-rnd" {
   availability_zone = "us-west-2a"
   type              = "gp2"
-  size              = "${var.storage_size}"
+  size              = var.storage_size
 
   tags = {
     Name = "jlk-alpine-rnd"
@@ -105,12 +105,12 @@ resource "aws_ebs_volume" "jlk-alpine-rnd" {
 }
 
 resource "aws_instance" "alpine_mirror" {
-  ami           = "${data.aws_ami.centos.id}"
+  ami           = "data.aws_ami.centos.id"
   instance_type = "m3.large"
   # get spot instance in here...
-  security_groups = ["${aws_security_group.web_server.id}"]
-  subnet_id = "${var.subnet_id}"
-  key_name = "${var.ssh_keypair_name}"
+  security_groups = ["aws_security_group.web_server.id"]
+  subnet_id = "var.subnet_id"
+  key_name = "var.ssh_keypair_name"
 
   root_block_device {
     delete_on_termination = true
@@ -130,9 +130,9 @@ output "instance_ip_addr" {
 resource "null_resource" "example" {}
 
 resource "aws_volume_attachment" "data_drive" {
-  device_name = "/dev/sdb"
-  volume_id = "${aws_ebs_volume.jlk-alpine-rnd.id}"
-  instance_id = "${aws_instance.alpine_mirror.id}"
+  device_name = "/dev/sdd"
+  volume_id = "aws_ebs_volume.jlk-alpine-rnd.id"
+  instance_id = "aws_instance.alpine_mirror.id"
 
   # Next line is here so provisioner doesn't run on destroy
   skip_destroy = true
@@ -140,13 +140,13 @@ resource "aws_volume_attachment" "data_drive" {
 
 resource "null_resource" "setup" {
   triggers = {
-    volume_attachment = "${aws_volume_attachment.data_drive.id}"
+    volume_attachment = "aws_volume_attachment.data_drive.id"
   }
 
   connection {
     type = "ssh"
     user = "centos"
-    host = "${element(aws_instance.alpine_mirror.*.public_ip, 0)}"
+    host = "element(aws_instance.alpine_mirror.*.public_ip, 0)"
     private_key = file("~/.ssh/id_rsa")
   }
 
